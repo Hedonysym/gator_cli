@@ -1,15 +1,19 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
+	_ "github.com/lib/pq"
+
 	"github.com/Hedonysym/gator_cli/internal/config"
+	"github.com/Hedonysym/gator_cli/internal/database"
 )
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Errorf("No command provided")
+		fmt.Println("No command provided")
 		os.Exit(1)
 	}
 	cfg, err := config.Read()
@@ -17,10 +21,20 @@ func main() {
 		fmt.Printf("Error reading config: %v\n", err)
 		os.Exit(1)
 	}
-
-	state := &state{config: &cfg}
+	db, err := sql.Open("postgres", cfg.DB_Url)
+	if err != nil {
+		fmt.Printf("Error connecting to database: %v\n", err)
+		os.Exit(1)
+	}
+	defer db.Close()
+	dbQueries := database.New(db)
+	state := &state{config: &cfg, db: dbQueries}
 	cmds := commands{}
 	cmds.register("login", handlerLogin)
+	cmds.register("register", handlerRegister)
+	cmds.register("reset", handlerReset)
+	cmds.register("users", handlerUsers)
+	cmds.register("agg", handlerAgg)
 
 	if len(os.Args) < 2 {
 		fmt.Println("No command provided")

@@ -1,9 +1,13 @@
 package main
 
-import "github.com/Hedonysym/gator_cli/internal/config"
+import (
+	"github.com/Hedonysym/gator_cli/internal/config"
+	"github.com/Hedonysym/gator_cli/internal/database"
+)
 
 type state struct {
 	config *config.Config
+	db     *database.Queries
 }
 
 type command struct {

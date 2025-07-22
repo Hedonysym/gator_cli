@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"os"
 )
 
 func handlerLogin(s *state, cmd command) error {
@@ -9,7 +11,12 @@ func handlerLogin(s *state, cmd command) error {
 		return fmt.Errorf("username argument is required")
 	}
 	username := cmd.args[0]
-	err := s.config.SetUser(username)
+	_, err := s.db.GetUser(context.Background(), username)
+	if err != nil {
+		defer os.Exit(1)
+		return fmt.Errorf("user not found: %w", err)
+	}
+	err = s.config.SetUser(username)
 	if err != nil {
 		return err
 	}
