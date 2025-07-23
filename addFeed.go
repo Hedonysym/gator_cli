@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/Hedonysym/gator_cli/internal/database"
+	"github.com/google/uuid"
 )
 
 func handlerAddFeed(s *state, cmd command) error {
@@ -19,10 +21,14 @@ func handlerAddFeed(s *state, cmd command) error {
 	url := cmd.args[1]
 
 	params := database.AddFeedParams{
-		Name:   name,
-		Url:    url,
-		UserID: user.ID,
+		ID:        uuid.New(),
+		Name:      name,
+		Url:       url,
+		UserID:    user.ID,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
+
 	feedID, err := s.db.AddFeed(context.Background(), params)
 	if err != nil {
 		return fmt.Errorf("error adding feed: %w", err)
