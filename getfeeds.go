@@ -26,5 +26,3 @@ func handlerGetFeeds(s *state, cmd command) error {
 
 	return nil
 }
-
-//
