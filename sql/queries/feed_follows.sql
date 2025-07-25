@@ -18,3 +18,7 @@ from feed_follows
 inner join feeds on feeds.id = feed_follows.feed_id
 where feed_follows.user_id = $1
 order by feed_follows.created_at desc;
+
+-- name: FeedUnfollow :exec
+delete from feed_follows
+where user_id = $1 and feed_id = $2;
