@@ -10,15 +10,11 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerFollow(s *state, cmd command) error {
+func handlerFollow(s *state, cmd command, currentUser database.User) error {
 	if len(cmd.args) < 1 {
 		return fmt.Errorf("usage: follow <feedUrl>")
 	}
 	feedUrl := cmd.args[0]
-	currentUser, err := s.db.GetUser(context.Background(), s.config.Current_user_name)
-	if err != nil {
-		return fmt.Errorf("error fetching current user: %v", err)
-	}
 	feed, err := s.db.GetFeedByUrl(context.Background(), feedUrl)
 	if err != nil {
 		return fmt.Errorf("error fetching feed: %v", err)
