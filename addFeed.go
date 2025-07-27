@@ -40,6 +40,6 @@ func handlerAddFeed(s *state, cmd command, user database.User) error {
 		return fmt.Errorf("error creating feed follow: %w", err)
 	}
 
-	fmt.Printf("Feed added")
+	fmt.Println("Feed added")
 	return nil
 }

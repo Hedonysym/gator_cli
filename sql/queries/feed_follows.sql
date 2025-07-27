@@ -22,3 +22,10 @@ order by feed_follows.created_at desc;
 -- name: FeedUnfollow :exec
 delete from feed_follows
 where user_id = $1 and feed_id = $2;
+
+-- name: GetNextFeedToFetch :one
+SELECT feeds.*
+FROM feeds
+WHERE feeds.user_id = $1
+order by feeds.last_fetched_at asc nulls first
+LIMIT 1;

@@ -1,21 +1,24 @@
 package main
 
 import (
-	"context"
 	"fmt"
+	"time"
+
+	"github.com/Hedonysym/gator_cli/internal/database"
 )
 
-func handlerAgg(state *state, cmd command) error {
-	/*
-		if len(cmd.args) < 1 {
-			return fmt.Errorf("usage: agg <feed_url>")
-		}*/
-	feedURL := "https://www.wagslane.dev/index.xml"
-	ctx := context.Background()
-	feed, err := fetchFeed(ctx, feedURL)
+func handlerAgg(s *state, cmd command, user database.User) error {
+	if len(cmd.args) < 1 {
+		return fmt.Errorf("usage: agg <*m*s>(minutes/seconds)")
+	}
+	timeBetweenFetches, err := time.ParseDuration(cmd.args[0])
 	if err != nil {
 		return err
 	}
-	fmt.Println(feed)
+	fmt.Println("Collecting feeds every %v", cmd.args[0])
+	ticker := time.NewTicker(timeBetweenFetches)
+	for ; ; <-ticker.C {
+		scrapeFeeds(s, user)
+	}
 	return nil
 }
