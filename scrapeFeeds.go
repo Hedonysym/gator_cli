@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/Hedonysym/gator_cli/internal/database"
+	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 func scrapeFeeds(s *state, user database.User) error {
@@ -31,8 +33,31 @@ func scrapeFeeds(s *state, user database.User) error {
 		return nil
 	}
 	fmt.Printf("Fetched %d items from feed %s\n", len(rss.Channel.Item), feed.Url)
+
 	for _, item := range rss.Channel.Item {
-		fmt.Println(item.Title)
+		published, err := time.Parse(time.RFC3339, item.PubDate)
+		if err != nil {
+			published = time.Now() // Fallback to current time if parsing fails
+		}
+		params := database.CreatePostParams{
+			ID:          uuid.New(),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+			Title:       item.Title,
+			Url:         item.Link,
+			Description: sql.NullString{String: item.Description, Valid: true},
+			PublishedAt: sql.NullTime{Time: published, Valid: true},
+			FeedID:      feed.ID,
+		}
+		_, err = s.db.CreatePost(context.Background(), params)
+		if err != nil {
+			if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
+				continue
+			} else {
+				return fmt.Errorf("error creating post: %w", err)
+			}
+		}
+
 	}
 	return nil
 }

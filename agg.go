@@ -15,7 +15,7 @@ func handlerAgg(s *state, cmd command, user database.User) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Collecting feeds every %v", cmd.args[0])
+	fmt.Printf("Collecting feeds every %v\n", cmd.args[0])
 	ticker := time.NewTicker(timeBetweenFetches)
 	for ; ; <-ticker.C {
 		scrapeFeeds(s, user)
